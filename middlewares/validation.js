@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { ValidationError } = require('../helpers/errors');
 
 const requiredFieldsSchema = Joi.object().keys({
   name: Joi.required(),
@@ -12,24 +13,29 @@ const contactSchema = Joi.object().keys({
   phone: Joi.string().pattern(/^\(([0-9]{3})\)([ ])([0-9]{3})([-])([0-9]{4})$/),
 });
 
-const validate = contactSchema => (req, res, next) => {
+const favoriteSchema = Joi.object().keys({
+  favorite: Joi.boolean().required(),
+});
+
+const validate = (schema, missingBodyMessage) => (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
-    res.status(400).send({ message: 'missing fields' });
+    res.status(400).send({ message: missingBodyMessage });
     return;
   }
-  const { error } = contactSchema.validate(req.body);
+  const { error } = schema.validate(req.body);
   if (error) {
-    const errorMessage = error.details[0].message;
-    res.status(400).send({ message: errorMessage });
+    next(new ValidationError(error.details[0].message));
   } else {
     next();
   }
 };
 
-const validateRequiredFields = validate(requiredFieldsSchema);
-const validateContactBody = validate(contactSchema);
+const validateRequiredFields = validate(requiredFieldsSchema, 'missing fields');
+const validateContactBody = validate(contactSchema, 'missing fields');
+const validateFavoriteBody = validate(favoriteSchema, 'missing field favorite');
 
 module.exports = {
   validateRequiredFields,
   validateContactBody,
+  validateFavoriteBody,
 };

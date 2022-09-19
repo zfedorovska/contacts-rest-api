@@ -1,78 +1,34 @@
 const express = require('express');
 const router = express.Router();
-const contacts = require('../../models/contacts');
 const validation = require('../../middlewares/validation');
+const { asyncWrapper } = require('../../helpers/apiHelpers');
+const {
+  getContactsController,
+  getContactByIdController,
+  addContactController,
+  deleteContactController,
+  changeContactController,
+  updateFavoriteByIdController,
+} = require('../../controllers/contactsController');
 
-router.get('/', async (req, res, next) => {
-  try {
-    const result = await contacts.listContacts();
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get('/:contactId', async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await contacts.getContactById(contactId);
-    if (result) {
-      res.json(result);
-    } else {
-      res.status(404).send({ message: 'Not found' });
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
+router.get('/', asyncWrapper(getContactsController));
+router.get('/:contactId', asyncWrapper(getContactByIdController));
 router.post(
   '/',
   validation.validateRequiredFields,
   validation.validateContactBody,
-  async (req, res, next) => {
-    try {
-      const { name, email, phone } = req.body;
-      const result = await contacts.addContact(name, email, phone);
-      res.status(201).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
+  asyncWrapper(addContactController)
 );
-
-router.delete('/:contactId', async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await contacts.removeContact(contactId);
-    if (result) {
-      res.json({
-        message: 'contact deleted',
-      });
-    } else {
-      res.status(404).send({ message: 'Not found' });
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
+router.delete('/:contactId', asyncWrapper(deleteContactController));
 router.put(
   '/:contactId',
   validation.validateContactBody,
-  async (req, res, next) => {
-    try {
-      const { contactId } = req.params;
-      const result = await contacts.updateContact(contactId, req.body);
-      if (result) {
-        res.json(result);
-      } else {
-        res.status(404).send({ message: 'Not found' });
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
+  asyncWrapper(changeContactController)
+);
+router.patch(
+  '/:contactId/favorite',
+  validation.validateFavoriteBody,
+  asyncWrapper(updateFavoriteByIdController)
 );
 
 module.exports = router;
