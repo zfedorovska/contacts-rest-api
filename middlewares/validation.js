@@ -13,6 +13,15 @@ const contactSchema = Joi.object().keys({
   phone: Joi.string().pattern(/^\(([0-9]{3})\)([ ])([0-9]{3})([-])([0-9]{4})$/),
 });
 
+const userSchema = Joi.object().keys({
+  email: Joi.string().email({ tlds: false }),
+  password: Joi.string().min(6).required(),
+});
+
+const subscriptionSchema = Joi.object().keys({
+  subscription: Joi.string().valid('starter', 'pro', 'business'),
+});
+
 const favoriteSchema = Joi.object().keys({
   favorite: Joi.boolean().required(),
 });
@@ -33,9 +42,16 @@ const validate = (schema, missingBodyMessage) => (req, res, next) => {
 const validateRequiredFields = validate(requiredFieldsSchema, 'missing fields');
 const validateContactBody = validate(contactSchema, 'missing fields');
 const validateFavoriteBody = validate(favoriteSchema, 'missing field favorite');
+const validateUserFields = validate(userSchema, 'missing fields');
+const validateSubscriptionField = validate(
+  subscriptionSchema,
+  'missing field subscription'
+);
 
 module.exports = {
   validateRequiredFields,
   validateContactBody,
   validateFavoriteBody,
+  validateUserFields,
+  validateSubscriptionField,
 };

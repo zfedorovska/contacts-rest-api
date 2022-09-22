@@ -1,15 +1,42 @@
-class ValidationError extends Error {
+class ContactsRestApiError extends Error {
   constructor(message) {
     super(message);
     this.status = 400;
   }
 }
 
-class NotFoundError extends Error {
+class ValidationError extends ContactsRestApiError {
+  constructor(message) {
+    super(message);
+    this.status = 400;
+  }
+}
+
+class EmailDuplicateError extends ContactsRestApiError {
+  constructor(message) {
+    super('Email in use');
+    this.status = 409;
+  }
+}
+
+class NotFoundError extends ContactsRestApiError {
   constructor(message) {
     super('Not found');
     this.status = 404;
   }
 }
 
-module.exports = { ValidationError, NotFoundError };
+class NotAuthorizedError extends ContactsRestApiError {
+  constructor(message) {
+    super(message);
+    this.status = 401;
+  }
+}
+
+module.exports = {
+  ContactsRestApiError,
+  ValidationError,
+  NotFoundError,
+  EmailDuplicateError,
+  NotAuthorizedError,
+};

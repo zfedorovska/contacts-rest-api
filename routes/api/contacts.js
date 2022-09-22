@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const validation = require('../../middlewares/validation');
+const { authMiddleware } = require('../../middlewares/authMiddleware');
 const { asyncWrapper } = require('../../helpers/apiHelpers');
 const {
   getContactsController,
@@ -11,6 +12,7 @@ const {
   updateFavoriteByIdController,
 } = require('../../controllers/contactsController');
 
+router.use(authMiddleware);
 router.get('/', asyncWrapper(getContactsController));
 router.get('/:contactId', asyncWrapper(getContactByIdController));
 router.post(
