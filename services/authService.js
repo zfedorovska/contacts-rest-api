@@ -3,10 +3,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { NotAuthorizedError } = require('../helpers/errors');
 
-const registration = async (email, password) => {
+const registration = async (email, password, avatarURL) => {
   const user = new User({
     email,
     password,
+    avatarURL,
   });
   await user.save();
   return user;
@@ -48,10 +49,19 @@ const updateSubscriptionById = async (userId, subscription) => {
   );
 };
 
+const updateAvatarById = (userId, avatarUrl) => {
+  return User.findByIdAndUpdate(
+    userId,
+    { avatarURL: avatarUrl },
+    { new: true }
+  );
+};
+
 module.exports = {
   registration,
   login,
   updateToken,
   getUserById,
   updateSubscriptionById,
+  updateAvatarById,
 };

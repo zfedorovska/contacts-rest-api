@@ -5,10 +5,12 @@ const {
   getUserById,
   updateSubscriptionById,
 } = require('../services/authService');
+const gravatar = require('gravatar');
 
 const registrationController = async (req, res) => {
   const { email, password } = req.body;
-  const user = await registration(email, password);
+  const avatarURL = gravatar.url(email, { s: '100', r: 'x', d: 'retro' }, true);
+  const user = await registration(email, password, avatarURL);
   res.status(201).json({
     user: {
       email: user.email,
