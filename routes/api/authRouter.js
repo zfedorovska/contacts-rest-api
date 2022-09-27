@@ -7,6 +7,8 @@ const { validateSubscriptionField } = require('../../middlewares/validation');
 const { asyncWrapper } = require('../../helpers/apiHelpers');
 const {
   registrationController,
+  registrationVerifyController,
+  registrationRepeatVerifyController,
   loginController,
   logoutController,
   getCurrentUserController,
@@ -22,6 +24,17 @@ router.post(
   validation.validateUserFields,
   asyncWrapper(registrationController)
 );
+router.get(
+  '/verify/:verificationToken',
+  asyncWrapper(registrationVerifyController)
+);
+
+router.post(
+  '/verify',
+  validation.validateEmailField,
+  asyncWrapper(registrationRepeatVerifyController)
+);
+
 router.post(
   '/login',
   validation.validateUserFields,

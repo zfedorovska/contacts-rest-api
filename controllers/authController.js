@@ -1,10 +1,14 @@
 const {
   registration,
+  registrationVerify,
   login,
   updateToken,
   getUserById,
+  getUserByEmail,
   updateSubscriptionById,
+  sentConfirmEmail,
 } = require('../services/authService');
+const { ValidationError } = require('../helpers/errors');
 const gravatar = require('gravatar');
 
 const registrationController = async (req, res) => {
@@ -16,6 +20,26 @@ const registrationController = async (req, res) => {
       email: user.email,
       subscription: user.subscription,
     },
+  });
+};
+
+const registrationVerifyController = async (req, res) => {
+  const { verificationToken } = req.params;
+  await registrationVerify(verificationToken);
+  res.json({
+    message: 'Verification successful',
+  });
+};
+
+const registrationRepeatVerifyController = async (req, res) => {
+  const { email } = req.body;
+  const user = await getUserByEmail(email);
+  if (user.verify) {
+    throw new ValidationError('Verification has already been passed');
+  }
+  await sentConfirmEmail(email, user.verificationToken);
+  res.json({
+    message: 'Verification email sent',
   });
 };
 
@@ -58,6 +82,8 @@ const updateSubscriptionController = async (req, res) => {
 
 module.exports = {
   registrationController,
+  registrationVerifyController,
+  registrationRepeatVerifyController,
   loginController,
   logoutController,
   getCurrentUserController,

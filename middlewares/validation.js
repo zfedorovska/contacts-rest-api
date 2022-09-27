@@ -18,6 +18,10 @@ const userSchema = Joi.object().keys({
   password: Joi.string().min(6).required(),
 });
 
+const emailSchema = Joi.object().keys({
+  email: Joi.string().email({ tlds: false }),
+});
+
 const subscriptionSchema = Joi.object().keys({
   subscription: Joi.string().valid('starter', 'pro', 'business'),
 });
@@ -43,6 +47,10 @@ const validateRequiredFields = validate(requiredFieldsSchema, 'missing fields');
 const validateContactBody = validate(contactSchema, 'missing fields');
 const validateFavoriteBody = validate(favoriteSchema, 'missing field favorite');
 const validateUserFields = validate(userSchema, 'missing fields');
+const validateEmailField = validate(
+  emailSchema,
+  'missing required field email'
+);
 const validateSubscriptionField = validate(
   subscriptionSchema,
   'missing field subscription'
@@ -53,5 +61,6 @@ module.exports = {
   validateContactBody,
   validateFavoriteBody,
   validateUserFields,
+  validateEmailField,
   validateSubscriptionField,
 };
